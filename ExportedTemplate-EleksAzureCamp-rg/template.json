@@ -1,0 +1,81 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_Windows_name": {
+            "defaultValue": "Windows",
+            "type": "String"
+        },
+        "disks_Windows_disk1_cef8fdad05234bca8f3584f87a6df26b_externalid": {
+            "defaultValue": "/subscriptions/f4004ed5-6cdb-4ddc-bb57-a852b2e2e577/resourceGroups/EleksAzureCamp-rg/providers/Microsoft.Compute/disks/Windows_disk1_cef8fdad05234bca8f3584f87a6df26b",
+            "type": "String"
+        },
+        "networkInterfaces_windows162_externalid": {
+            "defaultValue": "/subscriptions/f4004ed5-6cdb-4ddc-bb57-a852b2e2e577/resourceGroups/EleksAzureCamp-rg/providers/Microsoft.Network/networkInterfaces/windows162",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2021-07-01",
+            "name": "[parameters('virtualMachines_Windows_name')]",
+            "location": "eastus",
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_D2s_v3"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[concat('Microsoft', parameters('virtualMachines_Windows_name'), 'Server')]",
+                        "offer": "[concat(parameters('virtualMachines_Windows_name'), 'Server')]",
+                        "sku": "2019-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "[parameters('virtualMachines_Windows_name')]",
+                        "name": "[concat(parameters('virtualMachines_Windows_name'), '_disk1_cef8fdad05234bca8f3584f87a6df26b')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS",
+                            "id": "[parameters('disks_Windows_disk1_cef8fdad05234bca8f3584f87a6df26b_externalid')]"
+                        },
+                        "deleteOption": "Detach",
+                        "diskSizeGB": 127
+                    },
+                    "dataDisks": []
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_Windows_name')]",
+                    "adminUsername": "serhiyadmin",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true,
+                        "patchSettings": {
+                            "patchMode": "AutomaticByOS",
+                            "assessmentMode": "ImageDefault",
+                            "enableHotpatching": false
+                        }
+                    },
+                    "secrets": [],
+                    "allowExtensionOperations": true,
+                    "requireGuestProvisionSignal": true
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[parameters('networkInterfaces_windows162_externalid')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true
+                    }
+                }
+            }
+        }
+    ]
+}

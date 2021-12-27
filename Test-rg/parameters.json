@@ -1,0 +1,42 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "virtualMachines_VM_1_name": {
+            "value": null
+        },
+        "virtualMachines_VM_2_name": {
+            "value": null
+        },
+        "sshPublicKeys_test1234_name": {
+            "value": null
+        },
+        "networkInterfaces_vm_1694_name": {
+            "value": null
+        },
+        "networkInterfaces_vm_2883_name": {
+            "value": null
+        },
+        "publicIPAddresses_VM_1_ip_name": {
+            "value": null
+        },
+        "publicIPAddresses_VM_2_ip_name": {
+            "value": null
+        },
+        "virtualNetworks_TEST_vnet_name": {
+            "value": null
+        },
+        "networkSecurityGroups_VM_1_nsg_name": {
+            "value": null
+        },
+        "networkSecurityGroups_VM_2_nsg_name": {
+            "value": null
+        },
+        "disks_VM_1_disk1_fb0367b3d7ba451aa45f068e9685f3a3_externalid": {
+            "value": null
+        },
+        "disks_VM_2_OsDisk_1_78caa2e3da2e47bfaf662c68795da786_externalid": {
+            "value": null
+        }
+    }
+}

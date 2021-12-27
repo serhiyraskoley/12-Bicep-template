@@ -1,0 +1,6 @@
+commands
+
+ az deployment sub create -f .\main.bicep -l eastus 
+
+
+ az deployment sub create --location WestUS --parameters '{ \"policyName\": { \"value\": \"policy2\" } }' --template-file azuredeploy.json
