@@ -33,14 +33,21 @@ resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2021-05-
     ]
   }
 }
+
+
+
 module vm 'vm.bicep' = {
   name: 'virtualMachines'
   params: {
-    subnetRef: '${virtualNetworkName_resource}/properties/subnets[0]/id'
     adminUsername: adminUsername
     os: os
+    hostname: 'WebServer'
+    vnet: virtualNetworkName_resource.properties.subnets[0]
+    location: location
   }
 }
 
-output idvnet string =  virtualNetworkName_resource.properties.subnets[0].id
+
+
+// output idvnet string =  virtualNetworkName_resource.properties.subnets[0].id
 

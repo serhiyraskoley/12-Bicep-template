@@ -1,5 +1,5 @@
-param location string = resourceGroup().location
-param networkInterfaceName string = '${resourceGroup().name}-net'
+param location string
+param networkInterfaceName string = '${os}-net'
 param networkSecurityGroupName string = '${os}-nsg'
 param publicIpAddressName string = '${os}-IP'
 param publicIpAddressType string = 'Dynamic'
@@ -7,12 +7,12 @@ param publicIpAddressSku string = 'Basic'
 param osDiskType string = 'Premium_LRS'
 param virtualMachineSize string = 'Standard_D2s_v3'
 param os string
-param hostname string = os
+param hostname string
 param adminUsername string
 //@secure()
 param adminPassword string = 'Passw0rd123' 
 param enableHotpatching bool = false
-param subnetRef string 
+param vnet string
 var nsgId = resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', networkSecurityGroupName)
 
 resource networkInterfaceWindows 'Microsoft.Network/networkInterfaces@2021-05-01' = {
@@ -25,7 +25,8 @@ resource networkInterfaceWindows 'Microsoft.Network/networkInterfaces@2021-05-01
         properties: {
           subnet: {
             //<module-name>.outputs.<property-name>
-            id: subnetRef
+            //id: resourceId('Microsoft.Network/virtualNetworks/subnets', , 'default')
+            id: vnet 
           }
           privateIPAllocationMethod: 'Dynamic'
           publicIPAddress: {
@@ -44,7 +45,6 @@ resource networkInterfaceWindows 'Microsoft.Network/networkInterfaces@2021-05-01
   dependsOn: [
     networkSecurityGroupWindows
     publicIpAddressWindows
-    //resourceId(resourceGroup().name, 'Microsoft.Network/virtualNetworks', 'vmet')
   ]
 }
 
