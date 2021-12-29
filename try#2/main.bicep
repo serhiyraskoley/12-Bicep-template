@@ -18,28 +18,23 @@ resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
   location: location
 }
 
-module vn 'module/virtualnetwork.bicep' = {
-  scope: resourceGroup('EleksAzureDevOpsCamp-rg')
+module vn 'module/virtual-network.bicep' = {
+  scope: rg
   name: 'virtualNetwork'
   params: {
     location: location
   }
-  dependsOn: [
-    rg
-  ]
 }
 
-module vm 'module/virtualmachine.bicep' = {
-  scope: resourceGroup('EleksAzureDevOpsCamp-rg')
-  name: 'virtualMachines'
-  params: {
-    adminUsername: 'serhiyadmin'
-    os: os
-    subnetRef: vn.outputs.idvnet
-  }
-  dependsOn: [
-    vn
-  ]
-}
-
+ module vm 'module/virtual-machine.bicep' = {
+   scope: rg
+   name: 'virtualMachine'
+   params: {
+     computerName: 'Webserver'
+     os: os
+     subnetRef: vn.outputs.subnetRef
+     adminUsername: 'serhiyadmin' 
+     virtualNetworkName: vn.outputs.vnet
+   }
+ }
 
