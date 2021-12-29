@@ -2,18 +2,20 @@ targetScope = 'subscription'
 param resoursePrefix string = 'EleksAzureDevOpsCamp'
 param adminUserName string = 'serhiyadmin' 
 @description('Location')
-@allowed([
-  'eastus'
-  'westus'
-])
-// param location string = 'eastus'
-param location string
+// @allowed([
+//   'eastus'
+//   'westus'
+// ])
+param location string = 'eastus'
 @description('Operation System')
-@allowed([
+// @allowed([
+//   'Windows'
+//   'Linux'
+// ])
+param os array = [
   'Windows'
   'Linux'
-])
-param os array
+]
 @description('Hostname')
 param computerName string = 'Webserver'
 
@@ -30,21 +32,6 @@ module vn 'module/virtual-network.bicep' = {
     location: location
   }
 }
-
-//  module vm 'module/virtual-machine.bicep' = [for item in os{
-//    scope: rg
-//    name: 'virtualMachine'
-//    params: {
-//      computerName: computerName
-//      os: '${item}'
-//      adminUsername: adminUserName
-//      location: location
-//      subnetRef: vn.outputs.subnetRef
-//      virtualNetworkName: vn.outputs.vnet
-//    }
-// }
-// ]
-
 
 module vm 'module/virtual-machine.bicep' = [for item in os: {
   scope: rg
