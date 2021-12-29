@@ -26,7 +26,7 @@ resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2020-11-
     ]
   }
   tags: {
-    environment: '${resourceGroup().name}'
+    resoursegroup: '${resourceGroup().name}'
   }
 }
 

@@ -1,23 +1,17 @@
-param location string = resourceGroup().location
+param location string 
 param networkInterfaceName string = '${resourceGroup().name}-net'
 param networkSecurityGroupName string = '${resourceGroup().name}-nsg'
-// param networkSecurityGroupRules array 
 param virtualNetworkName string 
 param publicIpAddressName string = 'windows3-ip'
 param publicIpAddressType string = 'Dynamic'
 param publicIpAddressSku string = 'Basic'
-// param virtualMachineName string
-// param virtualMachineComputerName string = 'Windows'
-// param virtualMachineRG string
 param osDiskType string = 'Premium_LRS'
 param virtualMachineSize string = 'Standard_D2s_v3'
 param computerName string
 param hostname string = '${computerName}1'
 param adminUsername string
 param os string
-//@secure()
 param adminPassword string = 'Passw0rd123' 
-// param patchMode string = 'AutomaticByPlatform'
 param enableHotpatching bool = false
 param subnetRef string
 var nsgId = resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', networkSecurityGroupName)
@@ -45,7 +39,8 @@ resource networkInterfaceName_resource 'Microsoft.Network/networkInterfaces@2021
     }
   }
   tags: {
-    os: 'Windows'
+    resoursegroup: '${resourceGroup().name}'
+    environment: os
   }
   dependsOn: [
     resourceGroup('Microsoft.Network/virtualNetworks', virtualNetworkName)
@@ -74,32 +69,11 @@ resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGro
       }
     ]
   }
+  tags: {
+    resoursegroup: '${resourceGroup().name}'
+    environment: os
+  }
 }
-
-
-// resource virtualNetworkName_resource 'Microsoft.Network/virtualNetworks@2020-11-01' = {
-//   name: virtualNetworkName
-//   location: location
-//   properties: {
-//     addressSpace: {
-//       addressPrefixes: addressPrefixes
-//     }
-//     subnets: [
-//       {
-//         name: subnetName
-//         properties: {
-//           addressPrefix: addressPrefix
-//           delegations: []
-//           privateEndpointNetworkPolicies: 'Enabled'
-//           privateLinkServiceNetworkPolicies: 'Enabled'
-//         }
-//       }
-//     ]
-//   }
-//   tags: {
-//     os: 'Windows'
-//   }
-// }
 
 resource publicIpAddressName_resource 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
   name: publicIpAddressName
@@ -111,7 +85,7 @@ resource publicIpAddressName_resource 'Microsoft.Network/publicIpAddresses@2019-
     name: publicIpAddressSku
   }
   tags: {
-    os: 'Windows'
+    resoursegroup: '${resourceGroup().name}'
   }
 }
 
@@ -163,7 +137,8 @@ resource virtualMachineName_resource 'Microsoft.Compute/virtualMachines@2021-07-
     }
   }
   tags: {
-    os: 'Windows'
+    resoursegroup: '${resourceGroup().name}'
+    environment: os
   }
 }
 
