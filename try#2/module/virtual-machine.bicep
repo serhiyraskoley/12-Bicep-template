@@ -1,12 +1,9 @@
 param location string 
-param networkInterfaceName string = '${resourceGroup().name}-net'
-param networkSecurityGroupName string = '${resourceGroup().name}-nsg'
+param networkInterfaceName string = '${os}-net'
+param networkSecurityGroupName string = '${os}-nsg'
+param name string = '${os}-ipconfig'
 param virtualNetworkName string 
-param publicIpAddressName string = 'windows3-ip'
-param publicIpAddressType string = 'Dynamic'
-param publicIpAddressSku string = 'Basic'
-param osDiskType string = 'Premium_LRS'
-param virtualMachineSize string = 'Standard_D2s_v3'
+param publicIpAddressName string = '${os}-ip'
 param computerName string
 param hostname string = '${computerName}1'
 param adminUsername string
@@ -14,6 +11,11 @@ param os string
 param adminPassword string = 'Passw0rd123' 
 param enableHotpatching bool = false
 param subnetRef string
+param publisher string = (os == 'Windows') ? 'MicrosoftWindowsServer' : 'canonical'
+param offer string = (os == 'Windows') ? 'WindowsServer' : '0001-com-ubuntu-server-focal'
+param sku string = (os == 'Windows') ? '2019-datacenter-gensecond' : '20_04-lts'
+param namensg string = (os == 'Windows') ? 'Allow-RDP' : 'Allow-SSH'
+param destinationPortRange string = (os == 'Windows') ? '3389' : '22'
 var nsgId = resourceId(resourceGroup().name, 'Microsoft.Network/networkSecurityGroups', networkSecurityGroupName)
 
 resource networkInterfaceName_resource 'Microsoft.Network/networkInterfaces@2021-03-01' = {
@@ -22,7 +24,7 @@ resource networkInterfaceName_resource 'Microsoft.Network/networkInterfaces@2021
   properties: {
     ipConfigurations: [
       {
-        name: 'ipconfig1'
+        name: name
         properties: {
           subnet: {
             id: subnetRef
@@ -44,23 +46,23 @@ resource networkInterfaceName_resource 'Microsoft.Network/networkInterfaces@2021
   }
   dependsOn: [
     resourceGroup('Microsoft.Network/virtualNetworks', virtualNetworkName)
-    networkSecurityGroupName_resource
+    networkSecurityGroupWindows
     publicIpAddressName_resource
   ]
 }
 
-resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
+resource networkSecurityGroupWindows 'Microsoft.Network/networkSecurityGroups@2019-02-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
     securityRules: [
       {
-              name: 'Allow-RDP'
+              name: namensg
               properties: {
                 priority: 1000
                 sourceAddressPrefix: '*'
                 protocol: 'Tcp'
-                destinationPortRange: '3389'
+                destinationPortRange: destinationPortRange
                 access: 'Allow'
                 direction: 'Inbound'
                 sourcePortRange: '*'
@@ -75,38 +77,65 @@ resource networkSecurityGroupName_resource 'Microsoft.Network/networkSecurityGro
   }
 }
 
+// resource networkSecurityGroupLinux 'Microsoft.Network/networkSecurityGroups@2021-05-01' = if (os == 'Linux'){
+//   name: networkSecurityGroupName
+//   location: location
+//   properties: {
+//     securityRules: [
+//       {
+//               name: 'Allow-SSH'
+//               properties: {
+//                 priority: 1000
+//                 sourceAddressPrefix: '*'
+//                 protocol: 'Tcp'
+//                 destinationPortRange: '22'
+//                 access: 'Allow'
+//                 direction: 'Inbound'
+//                 sourcePortRange: '*'
+//                 destinationAddressPrefix: '*'
+//             }   
+//       }
+//     ]
+//   }
+//   tags: {
+//     resoursegroup: '${resourceGroup().name}'
+//     environment: os
+//   }
+// }
+
 resource publicIpAddressName_resource 'Microsoft.Network/publicIpAddresses@2019-02-01' = {
   name: publicIpAddressName
   location: location
   properties: {
-    publicIPAllocationMethod: publicIpAddressType
+    publicIPAllocationMethod: 'Dynamic'
   }
   sku: {
-    name: publicIpAddressSku
+    name: 'Basic'
   }
   tags: {
     resoursegroup: '${resourceGroup().name}'
+    environment: os
   }
 }
 
 resource virtualMachineName_resource 'Microsoft.Compute/virtualMachines@2021-07-01' = {
   name: os
-  location: resourceGroup().location
+  location: location
   properties: {
     hardwareProfile: {
-      vmSize: virtualMachineSize
+      vmSize: 'Standard_D2s_v3'
     }
     storageProfile: {
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: osDiskType
+          storageAccountType: 'Premium_LRS'
         }
       }
       imageReference: {
-        publisher: 'MicrosoftWindowsServer'
-        offer: 'WindowsServer'
-        sku: '2019-datacenter-gensecond'
+        publisher: publisher
+        offer: offer
+        sku: sku
         version: 'latest'
       }
     }
